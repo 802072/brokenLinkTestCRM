@@ -74,7 +74,7 @@ public class brokenLinkCRM {
 		while (myit.hasNext()) {
 
 			myurl = myit.next().getAttribute("href");
-			System.out.println("ALl links are :"+myurl);
+			System.out.println("The link is :"+myurl);
 			System.out.println(myurl);
 			if (myurl == null || myurl.isEmpty()) {
 				System.out.println("Empty URL or an Unconfigured URL");
