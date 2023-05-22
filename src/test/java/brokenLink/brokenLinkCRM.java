@@ -36,8 +36,6 @@ public class brokenLinkCRM {
 
 		WebDriverManager.chromedriver().setup();
 		driver = new ChromeDriver();
-		//System.setProperty(ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY,"True");
-		//System.setProperty("ChromeDriverService","True");
 		driver.manage().window().maximize();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
