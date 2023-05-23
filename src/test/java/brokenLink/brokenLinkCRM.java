@@ -41,6 +41,7 @@ public class brokenLinkCRM {
 	String myurl = "";
 	HttpURLConnection myhuc = null;
 	int responseCode = 200;
+	
 	String excelPath = "C:\\Users\\802072\\git\\brokenLinkTestCRM\\resources\\testData\\testData.xlsx";  
 	String sheetName = "loginInfo";
 	String username = "";
@@ -48,7 +49,6 @@ public class brokenLinkCRM {
 	
 	@BeforeTest
 	public void setUp() {
-
 		WebDriverManager.chromedriver().setup();
 		driver = new ChromeDriver();
 		driver.manage().window().maximize();
@@ -56,46 +56,42 @@ public class brokenLinkCRM {
 
 		driver.get(myhomePage);
 
-		// Read Excel file for username and password
-
+		//Read Excel file for username and password
 		try {
 			FileInputStream fileInputStream = new FileInputStream(new File(excelPath));
 			Workbook workbook = new XSSFWorkbook(fileInputStream);
 			Sheet sheet = workbook.getSheet(sheetName);
 
-
-			Row row = sheet.getRow(0);
+			Row row = sheet.getRow(1);
 			org.apache.poi.ss.usermodel.Cell usernameCell = row.getCell(0);
 			org.apache.poi.ss.usermodel.Cell passwordCell = row.getCell(1);
 
 			username = usernameCell.getStringCellValue();
 			password = passwordCell.getStringCellValue();
-
-			System.out.println(username);
+			System.out.println("The logged in user is:"+ username);
+			
 			workbook.close();
 			fileInputStream.close();
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	@Test
+	@Test (description= "log into the homepage")
 	public void login() {
 
-		//username
+		//enter username
 		WebElement uname = driver.findElement(By.xpath("//input[@id='input-25']"));
-		//uname.sendKeys("testuser3@vns-fullsbx.com");
 		uname.sendKeys(username);
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		//password
+		//enter password
 		WebElement pwd = driver.findElement(By.xpath("//input[@id='input-26']"));
-		//pwd.sendKeys("QATester123");
 		pwd.sendKeys(password);
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
@@ -108,12 +104,9 @@ public class brokenLinkCRM {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
 	}
 
-
-
-	@Test
+	@Test (description= "Check for broken links")
 	public void testBrokenLinks() {
 		List<WebElement> mylinks = driver.findElements(By.xpath("//a"));
 
