@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -17,15 +18,34 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.edge.EdgeDriver;
 //import org.testng.annotations.AfterTest;
 //import org.testng.annotations.BeforeTest;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import testBrokenLinkCRM.ExcelReader;
 
 public class brokenLinkCRM {
 
+	ExcelReader excel= new ExcelReader("loginData");
+
 	public static WebDriver driver;
+	
+	@DataProvider(name="login")
+	public Object[][] testDataSupplier() throws Exception {
+		Object[][] obj = new Object[excel.getRowCount()][1];
+		for (int i = 1; i <= excel.getRowCount(); i++) {
+			HashMap<String, String> testData = excel.getTestDataInMap(i);
+			obj[i-1][0] = testData;
+		}
+		return obj;
 
-	public static void main (String[] arg) {
+	}
 
+	@Test(dataProvider= "login")
+	public void brokenLinkTest (Object obj1){
+		@SuppressWarnings("unchecked")
+		HashMap<String, String> testData = (HashMap<String, String>) obj1;
+		System.out.println("The test data used for execution is:  "+ testData );
 		String myhomePage = "https://vnshealth-crm--fullsbx.sandbox.my.site.com/provider/login";
 
 		String myurl = "";
@@ -68,12 +88,12 @@ public class brokenLinkCRM {
 
 
 		List<WebElement> mylinks = driver.findElements(By.xpath("//a"));
-		
+
 		Iterator<WebElement> myit = mylinks.iterator();
 		while (myit.hasNext()) {
 
 			myurl = myit.next().getAttribute("href");
-			System.out.println("ALl links are :"+myurl);
+			System.out.println("The link is :"+myurl);
 			System.out.println(myurl);
 			if (myurl == null || myurl.isEmpty()) {
 				System.out.println("Empty URL or an Unconfigured URL");
@@ -108,6 +128,7 @@ public class brokenLinkCRM {
 
 		driver.close();
 	}
+
 
 
 }
