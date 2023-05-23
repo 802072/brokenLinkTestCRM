@@ -1,58 +1,53 @@
 package brokenLink;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeDriverService;
-import org.openqa.selenium.edge.EdgeDriver;
 //import org.testng.annotations.AfterTest;
 //import org.testng.annotations.BeforeTest;
-import org.testng.annotations.DataProvider;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
+import com.google.common.collect.Table.Cell;
+
 import io.github.bonigarcia.wdm.WebDriverManager;
-import testBrokenLinkCRM.ExcelReader;
 
 public class brokenLinkCRM {
 
-	ExcelReader excel= new ExcelReader("loginData");
-
 	public static WebDriver driver;
+
+	String myhomePage = "https://vnshealth-crm--fullsbx.sandbox.my.site.com/provider/login";
+
+	String myurl = "";
+	HttpURLConnection myhuc = null;
+	int responseCode = 200;
+	String excelPath = "C:\\Users\\802072\\git\\brokenLinkTestCRM\\resources\\testData\\testData.xlsx";  
+	String sheetName = "loginInfo";
+	String username = "";
+	String password = "";
 	
-	@DataProvider(name="login")
-	public Object[][] testDataSupplier() throws Exception {
-		Object[][] obj = new Object[excel.getRowCount()][1];
-		for (int i = 1; i <= excel.getRowCount(); i++) {
-			HashMap<String, String> testData = excel.getTestDataInMap(i);
-			obj[i-1][0] = testData;
-		}
-		return obj;
-
-	}
-
-	@Test(dataProvider= "login")
-	public void brokenLinkTest (Object obj1){
-		@SuppressWarnings("unchecked")
-		HashMap<String, String> testData = (HashMap<String, String>) obj1;
-		System.out.println("The test data used for execution is:  "+ testData );
-		String myhomePage = "https://vnshealth-crm--fullsbx.sandbox.my.site.com/provider/login";
-
-		String myurl = "";
-		HttpURLConnection myhuc = null;
-		int responseCode = 200;
-
-		JavascriptExecutor js = (JavascriptExecutor) driver;
+	@BeforeTest
+	public void setUp() {
 
 		WebDriverManager.chromedriver().setup();
 		driver = new ChromeDriver();
@@ -61,19 +56,47 @@ public class brokenLinkCRM {
 
 		driver.get(myhomePage);
 
+		// Read Excel file for username and password
+
+		try {
+			FileInputStream fileInputStream = new FileInputStream(new File(excelPath));
+			Workbook workbook = new XSSFWorkbook(fileInputStream);
+			Sheet sheet = workbook.getSheet(sheetName);
+
+
+			Row row = sheet.getRow(0);
+			org.apache.poi.ss.usermodel.Cell usernameCell = row.getCell(0);
+			org.apache.poi.ss.usermodel.Cell passwordCell = row.getCell(1);
+
+			username = usernameCell.getStringCellValue();
+			password = passwordCell.getStringCellValue();
+
+			System.out.println(username);
+			workbook.close();
+			fileInputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void login() {
+
 		//username
 		WebElement uname = driver.findElement(By.xpath("//input[@id='input-25']"));
-		uname.sendKeys("testuser3@vns-fullsbx.com");
+		//uname.sendKeys("testuser3@vns-fullsbx.com");
+		uname.sendKeys(username);
 		try {
 			Thread.sleep(5000);
 		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		//password
 		WebElement pwd = driver.findElement(By.xpath("//input[@id='input-26']"));
-		pwd.sendKeys("QATester123");
-
+		//pwd.sendKeys("QATester123");
+		pwd.sendKeys(password);
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
 		//login
@@ -86,7 +109,12 @@ public class brokenLinkCRM {
 			e.printStackTrace();
 		}
 
+	}
 
+
+
+	@Test
+	public void testBrokenLinks() {
 		List<WebElement> mylinks = driver.findElements(By.xpath("//a"));
 
 		Iterator<WebElement> myit = mylinks.iterator();
@@ -122,13 +150,15 @@ public class brokenLinkCRM {
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
-
-
 		}
+	}
 
+	@AfterTest
+	public void tearUp() {
 		driver.close();
 	}
 
 
-
 }
+
+

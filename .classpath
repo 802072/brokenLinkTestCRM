@@ -23,14 +23,10 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/dayan/.m2/repository/antlr/antlr/2.7.7/antlr-2.7.7.jar">
+	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="org.eclipse.jst.component.archivename" value="antlr-2.7.7.jar"/>
-			<attribute name="maven.groupId" value="antlr"/>
-			<attribute name="maven.artifactId" value="antlr"/>
-			<attribute name="maven.version" value="2.7.7"/>
-			<attribute name="maven.scope" value="compile"/>
+			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
